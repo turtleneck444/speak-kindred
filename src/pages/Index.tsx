@@ -585,7 +585,7 @@ const Index = () => {
           <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
             {/* Voice selector - hide on very small screens */}
             {elevenLabs.isAvailable && (
-              <div className="hidden sm:block bg-white/10 rounded-md">
+              <div className="hidden sm:block bg-white/90 text-primary rounded-md">
                 <VoiceSelector
                   selectedVoiceId={selectedVoiceId}
                   onVoiceSelect={(voiceId) => {
@@ -603,13 +603,15 @@ const Index = () => {
             )}
             
             {/* Settings */}
-            <SettingsPanel
-              preferences={preferences}
-              ttsSettings={ttsSettings}
-              voices={browserTTS.voices}
-              onPreferencesChange={handlePreferencesChange}
-              onTTSSettingsChange={handleTTSSettingsChange}
-            />
+            <div className="bg-white/90 text-primary rounded-md">
+              <SettingsPanel
+                preferences={preferences}
+                ttsSettings={ttsSettings}
+                voices={browserTTS.voices}
+                onPreferencesChange={handlePreferencesChange}
+                onTTSSettingsChange={handleTTSSettingsChange}
+              />
+            </div>
             
             {/* Edit mode toggle - larger touch target on mobile */}
             <Button
@@ -617,7 +619,7 @@ const Index = () => {
               size="icon"
               onClick={handleEditModeToggle}
               aria-label={isEditMode ? "Exit edit mode" : "Enter edit mode"}
-              className="h-9 w-9 sm:h-10 sm:w-10 touch-manipulation"
+              className="h-9 w-9 sm:h-10 sm:w-10 touch-manipulation bg-white/90 hover:bg-white text-primary"
             >
               {isEditMode ? <LockOpen className="h-4 w-4 sm:h-5 sm:w-5" /> : <Lock className="h-4 w-4 sm:h-5 sm:w-5" />}
             </Button>
@@ -626,7 +628,7 @@ const Index = () => {
             <Button 
               variant="secondary" 
               onClick={handleSignOut}
-              className="h-9 sm:h-10 px-2 sm:px-4 text-xs sm:text-sm touch-manipulation"
+              className="h-9 sm:h-10 px-2 sm:px-4 text-xs sm:text-sm touch-manipulation bg-white/90 hover:bg-white text-primary"
             >
               <span className="hidden sm:inline">Sign Out</span>
               <span className="sm:hidden">Out</span>
