@@ -51,7 +51,10 @@ export const CategoryNav = ({
                 key={category.id}
                 variant={activeCategory === category.id ? "default" : "outline"}
                 onClick={() => onCategorySelect(category.id)}
-                className="shrink-0 h-10 sm:h-9 px-3 sm:px-4 text-sm touch-manipulation"
+                className={cn(
+                  "shrink-0 h-10 sm:h-9 px-3 sm:px-4 text-sm touch-manipulation",
+                  activeCategory === category.id && "text-white hover:text-white"
+                )}
                 style={{
                   backgroundColor: activeCategory === category.id ? category.color : undefined,
                   borderColor: category.color,
