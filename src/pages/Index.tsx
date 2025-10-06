@@ -43,7 +43,7 @@ const defaultPreferences: Preferences = {
 };
 
 // ⚡ DEVELOPMENT MODE - Set to true to bypass authentication
-const DEV_MODE = false;
+const DEV_MODE = true;
 
 const Index = () => {
   const [session, setSession] = useState<Session | null>(null);
