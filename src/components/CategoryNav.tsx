@@ -32,16 +32,16 @@ export const CategoryNav = ({
   return (
     <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <ScrollArea className="w-full">
-        <div className="flex gap-2 p-3">
+        <div className="flex gap-2 p-2 sm:p-3">
           {showAllOption && (
             <Button
               variant={activeCategory === null ? "default" : "outline"}
               onClick={() => onCategorySelect(null)}
-              className="shrink-0"
+              className="shrink-0 h-10 sm:h-9 px-3 sm:px-4 text-sm touch-manipulation"
               aria-pressed={activeCategory === null}
             >
-              <Icons.Grid3x3 className="h-5 w-5 mr-2" />
-              All
+              <Icons.Grid3x3 className="h-4 w-4 sm:h-5 sm:w-5 mr-1 sm:mr-2" />
+              <span className="hidden xs:inline">All</span>
             </Button>
           )}
           {categories
@@ -51,7 +51,7 @@ export const CategoryNav = ({
                 key={category.id}
                 variant={activeCategory === category.id ? "default" : "outline"}
                 onClick={() => onCategorySelect(category.id)}
-                className="shrink-0"
+                className="shrink-0 h-10 sm:h-9 px-3 sm:px-4 text-sm touch-manipulation"
                 style={{
                   backgroundColor: activeCategory === category.id ? category.color : undefined,
                   borderColor: category.color,
@@ -59,7 +59,7 @@ export const CategoryNav = ({
                 aria-pressed={activeCategory === category.id}
               >
                 {getIcon(category.icon)}
-                <span className="ml-2">{category.name}</span>
+                <span className="ml-1 sm:ml-2 whitespace-nowrap">{category.name}</span>
               </Button>
             ))}
         </div>

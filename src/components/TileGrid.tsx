@@ -36,10 +36,10 @@ const colorMap: Record<string, string> = {
 };
 
 const sizeClasses = {
-  'small': 'h-20 text-sm',
-  'medium': 'h-24 text-base',
-  'large': 'h-32 text-lg',
-  'extra-large': 'h-40 text-xl',
+  'small': 'h-16 sm:h-20 text-xs sm:text-sm',
+  'medium': 'h-20 sm:h-24 text-sm sm:text-base',
+  'large': 'h-24 sm:h-32 text-base sm:text-lg',
+  'extra-large': 'h-32 sm:h-40 text-lg sm:text-xl',
 };
 
 export const TileGrid = ({ 
@@ -72,31 +72,32 @@ export const TileGrid = ({
   }[gridColumns] || 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4';
 
   return (
-    <div className={cn("grid gap-3 p-4", gridColsClass)}>
+    <div className={cn("grid gap-2 sm:gap-3 p-3 sm:p-4", gridColsClass)}>
       {tiles.map((tile) => (
         <Button
           key={tile.id}
           onClick={() => handleClick(tile)}
           className={cn(
-            "aac-tile relative",
+            "aac-tile relative touch-manipulation",
             colorMap[tile.color] || "bg-primary",
             "text-white hover:opacity-90 transition-opacity",
-            "flex flex-col items-center justify-center gap-2",
-            sizeClasses[tileSize]
+            "flex flex-col items-center justify-center gap-1 sm:gap-2",
+            sizeClasses[tileSize],
+            "active:scale-95 transition-transform"
           )}
           aria-label={`${tile.label}. Says: ${tile.speech_text}`}
         >
           {tile.is_favorite && (
-            <Star className="absolute top-2 right-2 h-5 w-5 text-yellow-300 fill-yellow-300" aria-hidden="true" />
+            <Star className="absolute top-1 right-1 sm:top-2 sm:right-2 h-4 w-4 sm:h-5 sm:w-5 text-yellow-300 fill-yellow-300" aria-hidden="true" />
           )}
           {isEditMode && (
-            <Edit className="absolute top-2 left-2 h-4 w-4 text-white/70" aria-hidden="true" />
+            <Edit className="absolute top-1 left-1 sm:top-2 sm:left-2 h-3 w-3 sm:h-4 sm:w-4 text-white/70" aria-hidden="true" />
           )}
           {tile.image_url ? (
             <img 
               src={tile.image_url} 
               alt="" 
-              className="h-12 w-12 object-contain mb-1"
+              className="h-8 w-8 sm:h-12 sm:w-12 object-contain mb-1"
               aria-hidden="true"
             />
           ) : tile.icon_name ? (
@@ -104,7 +105,7 @@ export const TileGrid = ({
               {getIcon(tile.icon_name)}
             </div>
           ) : null}
-          <span className="text-center break-words w-full px-2 font-semibold leading-tight">
+          <span className="text-center break-words w-full px-1 sm:px-2 font-semibold leading-tight">
             {tile.label}
           </span>
         </Button>

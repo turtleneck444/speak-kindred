@@ -572,48 +572,66 @@ const Index = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      {/* Header */}
-      <header className="bg-primary text-primary-foreground p-4 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">Rehman AI</h1>
-          {DEV_MODE && <span className="text-xs opacity-75">Demo Mode</span>}
-        </div>
-        <div className="flex gap-2">
-          {elevenLabs.isAvailable && (
-            <div className="bg-white/10 rounded-md">
-              <VoiceSelector
-                selectedVoiceId={selectedVoiceId}
-                onVoiceSelect={(voiceId) => {
-                  setSelectedVoiceId(voiceId);
-                  const voiceName = elevenLabs.voices.find(v => v.id === voiceId)?.name || 'Unknown';
-                  toast({ 
-                    title: "Voice Changed! 🎙️", 
-                    description: `Now using ${voiceName}'s voice!`,
-                    duration: 2000
-                  });
-                }}
-                onPreview={elevenLabs.previewVoice}
-              />
-            </div>
-          )}
-          <SettingsPanel
-            preferences={preferences}
-            ttsSettings={ttsSettings}
-            voices={browserTTS.voices}
-            onPreferencesChange={handlePreferencesChange}
-            onTTSSettingsChange={handleTTSSettingsChange}
-          />
-          <Button
-            variant="secondary"
-            size="icon"
-            onClick={handleEditModeToggle}
-            aria-label={isEditMode ? "Exit edit mode" : "Enter edit mode"}
-          >
-            {isEditMode ? <LockOpen className="h-5 w-5" /> : <Lock className="h-5 w-5" />}
-          </Button>
-          <Button variant="secondary" onClick={handleSignOut}>
-            Sign Out
-          </Button>
+      {/* Header - Responsive for all devices */}
+      <header className="bg-primary text-primary-foreground p-3 sm:p-4">
+        <div className="flex items-center justify-between gap-2">
+          {/* App title */}
+          <div className="min-w-0 flex-shrink">
+            <h1 className="text-lg sm:text-xl lg:text-2xl font-bold truncate">Rehman AI</h1>
+            {DEV_MODE && <span className="text-xs opacity-75">Demo Mode</span>}
+          </div>
+          
+          {/* Controls - responsive layout */}
+          <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+            {/* Voice selector - hide on very small screens */}
+            {elevenLabs.isAvailable && (
+              <div className="hidden sm:block bg-white/10 rounded-md">
+                <VoiceSelector
+                  selectedVoiceId={selectedVoiceId}
+                  onVoiceSelect={(voiceId) => {
+                    setSelectedVoiceId(voiceId);
+                    const voiceName = elevenLabs.voices.find(v => v.id === voiceId)?.name || 'Unknown';
+                    toast({ 
+                      title: "Voice Changed! 🎙️", 
+                      description: `Now using ${voiceName}'s voice!`,
+                      duration: 2000
+                    });
+                  }}
+                  onPreview={elevenLabs.previewVoice}
+                />
+              </div>
+            )}
+            
+            {/* Settings */}
+            <SettingsPanel
+              preferences={preferences}
+              ttsSettings={ttsSettings}
+              voices={browserTTS.voices}
+              onPreferencesChange={handlePreferencesChange}
+              onTTSSettingsChange={handleTTSSettingsChange}
+            />
+            
+            {/* Edit mode toggle - larger touch target on mobile */}
+            <Button
+              variant="secondary"
+              size="icon"
+              onClick={handleEditModeToggle}
+              aria-label={isEditMode ? "Exit edit mode" : "Enter edit mode"}
+              className="h-9 w-9 sm:h-10 sm:w-10 touch-manipulation"
+            >
+              {isEditMode ? <LockOpen className="h-4 w-4 sm:h-5 sm:w-5" /> : <Lock className="h-4 w-4 sm:h-5 sm:w-5" />}
+            </Button>
+            
+            {/* Sign out - hide text on mobile */}
+            <Button 
+              variant="secondary" 
+              onClick={handleSignOut}
+              className="h-9 sm:h-10 px-2 sm:px-4 text-xs sm:text-sm touch-manipulation"
+            >
+              <span className="hidden sm:inline">Sign Out</span>
+              <span className="sm:hidden">Out</span>
+            </Button>
+          </div>
         </div>
       </header>
 
