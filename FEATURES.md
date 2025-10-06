@@ -1,7 +1,7 @@
-# SpeakKindred - Feature Documentation
+# Rehman AI - Feature Documentation
 
 ## Overview
-SpeakKindred is a comprehensive Augmentative and Alternative Communication (AAC) application designed to empower individuals with speech disabilities to communicate effectively and independently.
+Rehman AI is a comprehensive Augmentative and Alternative Communication (AAC) application designed to empower individuals with speech disabilities to communicate effectively and independently.
 
 ## Core Features
 
@@ -208,4 +208,4 @@ SpeakKindred is a comprehensive Augmentative and Alternative Communication (AAC)
 
 ---
 
-**SpeakKindred** - Empowering communication for everyone.
+**Rehman AI** - Empowering communication for everyone.

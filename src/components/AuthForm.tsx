@@ -55,7 +55,7 @@ export const AuthForm = () => {
     <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-primary/10 to-secondary/10">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-bold">SpeakKindred</CardTitle>
+          <CardTitle className="text-3xl font-bold">Rehman AI</CardTitle>
           <CardDescription className="text-lg">
             {isLogin ? "Sign in to access your boards" : "Create your account"}
           </CardDescription>

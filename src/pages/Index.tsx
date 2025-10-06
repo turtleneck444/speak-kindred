@@ -575,7 +575,7 @@ const Index = () => {
       {/* Header */}
       <header className="bg-primary text-primary-foreground p-4 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">SpeakKindred</h1>
+          <h1 className="text-2xl font-bold">Rehman AI</h1>
           {DEV_MODE && <span className="text-xs opacity-75">Demo Mode</span>}
         </div>
         <div className="flex gap-2">

@@ -1,11 +1,11 @@
-# SpeakKindred - Powerful AAC Communication App
+# Rehman AI - Powerful AAC Communication App
 
-![SpeakKindred](https://img.shields.io/badge/AAC-Communication-blue)
+![Rehman AI](https://img.shields.io/badge/AAC-Communication-blue)
 ![React](https://img.shields.io/badge/React-18.3-blue)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue)
 ![Supabase](https://img.shields.io/badge/Supabase-Ready-green)
 
-**SpeakKindred** is a comprehensive, professional-grade Augmentative and Alternative Communication (AAC) application designed to empower individuals with speech disabilities to communicate effectively and independently.
+**Rehman AI** is a comprehensive, professional-grade Augmentative and Alternative Communication (AAC) application designed to empower individuals with speech disabilities to communicate effectively and independently.
 
 ## 🌟 Key Features
 
@@ -86,7 +86,7 @@ npm run dev
 
 ```
 ┌─────────────────────────────────────────────────┐
-│  SpeakKindred    [Settings] [Lock] [Sign Out]  │ Header
+│  Rehman AI    [Settings] [Lock] [Sign Out]  │ Header
 ├─────────────────────────────────────────────────┤
 │  🚨 Emergency: [Help] [Call] [Pain] [911]      │ Emergency Bar
 ├─────────────────────────────────────────────────┤
@@ -109,7 +109,7 @@ npm run dev
 
 ## 🎨 AAC Color Standards
 
-SpeakKindred follows industry-standard AAC color conventions:
+Rehman AI follows industry-standard AAC color conventions:
 
 - 🔵 **Blue** - Basic communication, requests ("I want")
 - 🟢 **Green** - Affirmative, positive responses ("Yes", "Good")
@@ -283,10 +283,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🌟 Star History
 
-If you find SpeakKindred helpful, please consider giving it a star! ⭐
+If you find Rehman AI helpful, please consider giving it a star! ⭐
 
 ---
 
-**SpeakKindred** - Empowering communication for everyone, everywhere.
+**Rehman AI** - Empowering communication for everyone, everywhere.
 
 Made with ❤️ for the AAC community

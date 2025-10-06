@@ -1,6 +1,6 @@
 {
-  "name": "SpeakKindred",
-  "short_name": "SpeakKindred",
+  "name": "Rehman AI",
+  "short_name": "Rehman AI",
   "description": "Accessible AAC communication app for disabled users",
   "start_url": "/",
   "display": "standalone",
