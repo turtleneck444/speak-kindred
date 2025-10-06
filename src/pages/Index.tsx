@@ -13,6 +13,7 @@ import { QuickPhrase } from "@/components/QuickPhrasesPanel";
 import { SettingsPanel } from "@/components/SettingsPanel";
 import { useTTS } from "@/hooks/useTTS";
 import { useElevenLabsTTS } from "@/hooks/useElevenLabsTTS";
+import { useScanningMode } from "@/hooks/useScanningMode";
 import { VoiceSelector } from "@/components/VoiceSelector";
 import { Button } from "@/components/ui/button";
 import { Lock, LockOpen } from "lucide-react";
@@ -76,6 +77,13 @@ const Index = () => {
   const voices = elevenLabs.isAvailable ? elevenLabs.voices : browserTTS.voices;
   
   const { toast } = useToast();
+
+  // Scanning mode for accessibility
+  useScanningMode({
+    enabled: preferences.enableScanning,
+    speed: preferences.scanningSpeed,
+    highlightColor: '#FFD700',
+  });
 
   useEffect(() => {
     if (DEV_MODE) {
