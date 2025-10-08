@@ -4,6 +4,7 @@ import { Session } from "@supabase/supabase-js";
 import { AuthForm } from "@/components/AuthForm";
 import { TileGrid, Tile } from "@/components/TileGrid";
 import { UtteranceBar } from "@/components/UtteranceBar";
+import { VirtualKeyboard } from "@/components/VirtualKeyboard";
 import { EditModeDialog } from "@/components/EditModeDialog";
 import { CategoryNav, Category } from "@/components/CategoryNav";
 import { EmergencyBar, EmergencyPhrase } from "@/components/EmergencyBar";
@@ -66,6 +67,7 @@ const Index = () => {
   const [preferences, setPreferences] = useState<Preferences>(defaultPreferences);
   const [ttsSettings, setTtsSettings] = useState({ rate: 0.45, pitch: 1.0, voice: "default" });
   const [selectedVoiceId, setSelectedVoiceId] = useState("EXAVITQu4vr4xnSDxMaL"); // Default to Sarah
+  const [showKeyboard, setShowKeyboard] = useState(false);
   
   // Use ElevenLabs for amazing AI voices! 🎙️
   const elevenLabs = useElevenLabsTTS({ voiceId: selectedVoiceId });
@@ -495,6 +497,38 @@ const Index = () => {
     setUtterance(utterance.slice(0, -1));
   };
 
+  const handleKeyboardType = (char: string) => {
+    // Get the current text
+    const currentText = utterance.join(" ");
+    
+    // Append the new character
+    const newText = currentText + char;
+    
+    // Split back into words, but keep empty string at end if text ends with space
+    if (newText.endsWith(" ")) {
+      const words = newText.split(" ").filter(w => w.length > 0);
+      setUtterance([...words, ""]);
+    } else {
+      const words = newText.split(" ").filter(w => w.length > 0);
+      setUtterance(words);
+    }
+  };
+
+  const handleKeyboardSpace = () => {
+    // Only add space if we have content and don't already end with a space
+    if (utterance.length > 0 && utterance[utterance.length - 1] !== "") {
+      setUtterance([...utterance, ""]);
+    }
+  };
+
+  const handleKeyboardBackspace = () => {
+    handleBackspace();
+  };
+
+  const handleKeyboardToggle = () => {
+    setShowKeyboard(!showKeyboard);
+  };
+
   const handleQuickPhraseSelect = (phrase: string) => {
     speak(phrase);
     toast({ title: "Quick phrase spoken", description: phrase });
@@ -665,10 +699,23 @@ const Index = () => {
         onClear={handleClear}
         onBackspace={handleBackspace}
         onDeleteWord={handleDeleteWord}
+        onKeyboardToggle={handleKeyboardToggle}
+        showKeyboard={showKeyboard}
         isSpeaking={isSpeaking}
         quickPhrases={quickPhrases}
         onQuickPhraseSelect={handleQuickPhraseSelect}
       />
+
+      {/* Virtual Keyboard */}
+      {showKeyboard && (
+        <VirtualKeyboard
+          onType={handleKeyboardType}
+          onBackspace={handleKeyboardBackspace}
+          onSpace={handleKeyboardSpace}
+          onClear={handleClear}
+          onSpeak={handleSpeak}
+        />
+      )}
 
       {/* Word Prediction */}
       <WordPrediction

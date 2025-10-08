@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Volume2, X, Delete, ArrowLeft } from "lucide-react";
+import { Volume2, X, Delete, ArrowLeft, Keyboard } from "lucide-react";
 import { QuickPhrasesPanel, QuickPhrase } from "./QuickPhrasesPanel";
 
 interface UtteranceBarProps {
@@ -9,6 +9,8 @@ interface UtteranceBarProps {
   onClear: () => void;
   onBackspace: () => void;
   onDeleteWord: () => void;
+  onKeyboardToggle: () => void;
+  showKeyboard: boolean;
   isSpeaking: boolean;
   quickPhrases: QuickPhrase[];
   onQuickPhraseSelect: (phrase: string) => void;
@@ -21,6 +23,8 @@ export const UtteranceBar = ({
   onClear, 
   onBackspace,
   onDeleteWord,
+  onKeyboardToggle,
+  showKeyboard,
   isSpeaking,
   quickPhrases,
   onQuickPhraseSelect
@@ -54,6 +58,15 @@ export const UtteranceBar = ({
             >
               <Volume2 className="mr-2 h-5 w-5" />
               Speak
+            </Button>
+            <Button
+              size="lg"
+              variant={showKeyboard ? "default" : "outline"}
+              onClick={onKeyboardToggle}
+              className="h-12 sm:h-11 lg:h-[38px] px-3 sm:px-4 touch-manipulation"
+              aria-label={showKeyboard ? "Hide keyboard" : "Show keyboard"}
+            >
+              <Keyboard className="h-5 w-5" />
             </Button>
             <QuickPhrasesPanel 
               phrases={quickPhrases}
