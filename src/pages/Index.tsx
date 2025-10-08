@@ -11,6 +11,7 @@ import { WordPrediction } from "@/components/WordPrediction";
 import { RecentlyUsed } from "@/components/RecentlyUsed";
 import { QuickPhrase } from "@/components/QuickPhrasesPanel";
 import { SettingsPanel } from "@/components/SettingsPanel";
+import { ThemeSelector } from "@/components/ThemeSelector";
 import { useTTS } from "@/hooks/useTTS";
 import { useElevenLabsTTS } from "@/hooks/useElevenLabsTTS";
 import { useScanningMode } from "@/hooks/useScanningMode";
@@ -591,6 +592,9 @@ const Index = () => {
           
           {/* Controls - responsive layout */}
           <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+            {/* Theme selector */}
+            <ThemeSelector />
+            
             {/* Voice selector - hide on very small screens */}
             {elevenLabs.isAvailable && (
               <div className="hidden sm:block bg-white/90 text-primary rounded-md">
