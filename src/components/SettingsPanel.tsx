@@ -1,265 +1,201 @@
-import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Slider } from "@/components/ui/slider";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Settings, Volume2, Zap, Grid3x3, Eye, Clock } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
+import { Switch } from '@/components/ui/switch';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { useLanguage } from '@/hooks/useLanguage';
+import { useTranslation } from '@/i18n/translations';
+import { Button } from '@/components/ui/button';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
+import { Settings } from 'lucide-react';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
-interface SettingsPanelProps {
-  preferences: {
-    enableWordPrediction: boolean;
-    enableScanning: boolean;
-    scanningSpeed: number;
-    enableAutoSpeak: boolean;
-    showRecentlyUsed: boolean;
-    maxRecentTiles: number;
-    enableEmergencyBar: boolean;
-    tileSize: string;
-    gridColumns: number;
-  };
-  ttsSettings: {
-    rate: number;
-    pitch: number;
-    voice: string;
-  };
-  voices: SpeechSynthesisVoice[];
-  onPreferencesChange: (preferences: any) => void;
-  onTTSSettingsChange: (settings: any) => void;
+interface SettingsType {
+  rate: number;
+  pitch: number;
+  voice: string;
+  dwellMode?: boolean;
+  dwellMs?: number;
+  scanSpeed?: number;
+  textScale?: number;
+  highContrast?: boolean;
 }
 
-export const SettingsPanel = ({ 
-  preferences, 
-  ttsSettings,
-  voices,
-  onPreferencesChange, 
-  onTTSSettingsChange 
-}: SettingsPanelProps) => {
+interface SettingsPanelProps {
+  settings: SettingsType;
+  onSettingsChange: (settings: SettingsType) => void;
+  voices: SpeechSynthesisVoice[];
+}
+
+export const SettingsPanel = ({ settings, onSettingsChange, voices }: SettingsPanelProps) => {
+  const { toast } = useToast();
+  const { language } = useLanguage();
+  const { t } = useTranslation(language);
+
+  const saveSettings = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (user) {
+        const { error } = await supabase
+          .from('profiles')
+          .update({ settings: settings as any })
+          .eq('id', user.id);
+
+        if (error) throw error;
+
+        toast({
+          title: "Settings Saved",
+          description: "Your settings have been saved successfully.",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to save settings.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="outline" size="icon" aria-label="Settings">
+        <Button variant="ghost" size="icon">
           <Settings className="h-5 w-5" />
         </Button>
       </SheetTrigger>
-      <SheetContent side="right" className="w-full sm:max-w-lg">
+      <SheetContent side="right">
         <SheetHeader>
-          <SheetTitle className="flex items-center gap-2">
-            <Settings className="h-5 w-5" />
-            Settings
-          </SheetTitle>
+          <SheetTitle>{t('settings')}</SheetTitle>
         </SheetHeader>
-        <ScrollArea className="h-[calc(100vh-8rem)] mt-6 pr-4">
-          <div className="space-y-6">
-            {/* Communication Settings */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <Volume2 className="h-4 w-4" />
-                <h3 className="text-lg font-semibold">Speech</h3>
-              </div>
-              
-              <div className="space-y-4 pl-6">
-                <div className="space-y-2">
-                  <Label>Voice</Label>
-                  <Select 
-                    value={ttsSettings.voice} 
-                    onValueChange={(value) => onTTSSettingsChange({ ...ttsSettings, voice: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="default">Default Voice</SelectItem>
-                      {voices.map((voice) => (
-                        <SelectItem key={voice.name} value={voice.name}>
-                          {voice.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+        <ScrollArea className="h-[calc(100vh-100px)] pr-4">
+      <div className="space-y-6 mt-6">
+        <div className="space-y-2">
+          <Label htmlFor="voice">{t('voice')}</Label>
+          <Select
+            value={settings.voice}
+            onValueChange={(value) =>
+              onSettingsChange({ ...settings, voice: value })
+            }
+          >
+            <SelectTrigger id="voice">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="default">Default</SelectItem>
+              {voices.map((voice) => (
+                <SelectItem key={voice.name} value={voice.name}>
+                  {voice.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
-                <div className="space-y-2">
-                  <Label>Speech Rate: {ttsSettings.rate.toFixed(2)}</Label>
-                  <Slider
-                    value={[ttsSettings.rate]}
-                    onValueChange={([value]) => onTTSSettingsChange({ ...ttsSettings, rate: value })}
-                    min={0.1}
-                    max={2.0}
-                    step={0.1}
-                    className="w-full"
-                  />
-                </div>
+        <div className="space-y-2">
+          <Label htmlFor="speed">{t('speed')}: {settings.rate.toFixed(2)}</Label>
+          <Slider
+            id="speed"
+            value={[settings.rate]}
+            onValueChange={([value]) =>
+              onSettingsChange({ ...settings, rate: value })
+            }
+            min={0.1}
+            max={2.0}
+            step={0.1}
+          />
+        </div>
 
-                <div className="space-y-2">
-                  <Label>Speech Pitch: {ttsSettings.pitch.toFixed(2)}</Label>
-                  <Slider
-                    value={[ttsSettings.pitch]}
-                    onValueChange={([value]) => onTTSSettingsChange({ ...ttsSettings, pitch: value })}
-                    min={0.1}
-                    max={2.0}
-                    step={0.1}
-                    className="w-full"
-                  />
-                </div>
+        <div className="space-y-2">
+          <Label htmlFor="pitch">{t('pitch')}: {settings.pitch.toFixed(2)}</Label>
+          <Slider
+            id="pitch"
+            value={[settings.pitch]}
+            onValueChange={([value]) =>
+              onSettingsChange({ ...settings, pitch: value })
+            }
+            min={0.1}
+            max={2.0}
+            step={0.1}
+          />
+        </div>
 
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="auto-speak">Auto-speak after tile</Label>
-                  <Switch
-                    id="auto-speak"
-                    checked={preferences.enableAutoSpeak}
-                    onCheckedChange={(checked) => 
-                      onPreferencesChange({ ...preferences, enableAutoSpeak: checked })
-                    }
-                  />
-                </div>
-              </div>
-            </div>
+        <div className="space-y-2">
+          <Label htmlFor="scanSpeed">{t('scan_speed')}: {settings.scanSpeed}ms</Label>
+          <Slider
+            id="scanSpeed"
+            value={[settings.scanSpeed || 1000]}
+            onValueChange={([value]) =>
+              onSettingsChange({ ...settings, scanSpeed: value })
+            }
+            min={500}
+            max={3000}
+            step={100}
+          />
+        </div>
 
-            <Separator />
+        <div className="space-y-2">
+          <Label htmlFor="dwellTime">{t('dwell_time')}: {settings.dwellMs}ms</Label>
+          <Slider
+            id="dwellTime"
+            value={[settings.dwellMs || 2000]}
+            onValueChange={([value]) =>
+              onSettingsChange({ ...settings, dwellMs: value })
+            }
+            min={500}
+            max={5000}
+            step={100}
+          />
+        </div>
 
-            {/* Display Settings */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <Eye className="h-4 w-4" />
-                <h3 className="text-lg font-semibold">Display</h3>
-              </div>
-              
-              <div className="space-y-4 pl-6">
-                <div className="space-y-2">
-                  <Label>Tile Size</Label>
-                  <Select 
-                    value={preferences.tileSize} 
-                    onValueChange={(value) => onPreferencesChange({ ...preferences, tileSize: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="small">Small</SelectItem>
-                      <SelectItem value="medium">Medium</SelectItem>
-                      <SelectItem value="large">Large</SelectItem>
-                      <SelectItem value="extra-large">Extra Large</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+        <div className="space-y-2">
+          <Label htmlFor="textScale">{t('text_size')}: {settings.textScale?.toFixed(1)}x</Label>
+          <Slider
+            id="textScale"
+            value={[settings.textScale || 1.2]}
+            onValueChange={([value]) =>
+              onSettingsChange({ ...settings, textScale: value })
+            }
+            min={0.8}
+            max={2.0}
+            step={0.1}
+          />
+        </div>
 
-                <div className="space-y-2">
-                  <Label>Grid Columns: {preferences.gridColumns}</Label>
-                  <Slider
-                    value={[preferences.gridColumns]}
-                    onValueChange={([value]) => onPreferencesChange({ ...preferences, gridColumns: value })}
-                    min={2}
-                    max={6}
-                    step={1}
-                    className="w-full"
-                  />
-                </div>
-              </div>
-            </div>
+        <div className="flex items-center justify-between">
+          <Label htmlFor="dwellMode">{t('dwell_mode')}</Label>
+          <Switch
+            id="dwellMode"
+            checked={settings.dwellMode || false}
+            onCheckedChange={(checked) => 
+              onSettingsChange({ ...settings, dwellMode: checked })
+            }
+          />
+        </div>
 
-            <Separator />
-
-            {/* Features */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <Zap className="h-4 w-4" />
-                <h3 className="text-lg font-semibold">Features</h3>
-              </div>
-              
-              <div className="space-y-4 pl-6">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="word-prediction">Word Prediction</Label>
-                  <Switch
-                    id="word-prediction"
-                    checked={preferences.enableWordPrediction}
-                    onCheckedChange={(checked) => 
-                      onPreferencesChange({ ...preferences, enableWordPrediction: checked })
-                    }
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="emergency-bar">Emergency Bar</Label>
-                  <Switch
-                    id="emergency-bar"
-                    checked={preferences.enableEmergencyBar}
-                    onCheckedChange={(checked) => 
-                      onPreferencesChange({ ...preferences, enableEmergencyBar: checked })
-                    }
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="recently-used">Show Recently Used</Label>
-                  <Switch
-                    id="recently-used"
-                    checked={preferences.showRecentlyUsed}
-                    onCheckedChange={(checked) => 
-                      onPreferencesChange({ ...preferences, showRecentlyUsed: checked })
-                    }
-                  />
-                </div>
-
-                {preferences.showRecentlyUsed && (
-                  <div className="space-y-2 pl-4">
-                    <Label>Max Recent Tiles: {preferences.maxRecentTiles}</Label>
-                    <Slider
-                      value={[preferences.maxRecentTiles]}
-                      onValueChange={([value]) => 
-                        onPreferencesChange({ ...preferences, maxRecentTiles: value })
-                      }
-                      min={3}
-                      max={12}
-                      step={1}
-                      className="w-full"
-                    />
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <Separator />
-
-            {/* Accessibility */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <Grid3x3 className="h-4 w-4" />
-                <h3 className="text-lg font-semibold">Accessibility</h3>
-              </div>
-              
-              <div className="space-y-4 pl-6">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="scanning-mode">Scanning Mode</Label>
-                  <Switch
-                    id="scanning-mode"
-                    checked={preferences.enableScanning}
-                    onCheckedChange={(checked) => 
-                      onPreferencesChange({ ...preferences, enableScanning: checked })
-                    }
-                  />
-                </div>
-
-                {preferences.enableScanning && (
-                  <div className="space-y-2 pl-4">
-                    <Label>Scan Speed: {preferences.scanningSpeed}ms</Label>
-                    <Slider
-                      value={[preferences.scanningSpeed]}
-                      onValueChange={([value]) => 
-                        onPreferencesChange({ ...preferences, scanningSpeed: value })
-                      }
-                      min={500}
-                      max={3000}
-                      step={100}
-                      className="w-full"
-                    />
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+        <div className="flex items-center justify-between">
+          <Label htmlFor="highContrast">{t('high_contrast')}</Label>
+          <Switch
+            id="highContrast"
+            checked={settings.highContrast || false}
+            onCheckedChange={(checked) => 
+              onSettingsChange({ ...settings, highContrast: checked })
+            }
+          />
+        </div>
+        
+        <Button onClick={saveSettings} className="w-full" size="lg">
+          {t('save_settings')}
+        </Button>
+      </div>
         </ScrollArea>
       </SheetContent>
     </Sheet>

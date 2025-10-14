@@ -13,12 +13,17 @@ import { RecentlyUsed } from "@/components/RecentlyUsed";
 import { QuickPhrase } from "@/components/QuickPhrasesPanel";
 import { SettingsPanel } from "@/components/SettingsPanel";
 import { ThemeSelector } from "@/components/ThemeSelector";
+import { LanguageSelector } from "@/components/LanguageSelector";
 import { useTTS } from "@/hooks/useTTS";
 import { useElevenLabsTTS } from "@/hooks/useElevenLabsTTS";
 import { useScanningMode } from "@/hooks/useScanningMode";
+import { useDwellMode } from "@/hooks/useDwellMode";
+import { useVoiceInput } from "@/hooks/useVoiceInput";
+import { useLanguage } from "@/hooks/useLanguage";
+import { useTranslation } from "@/i18n/translations";
 import { VoiceSelector } from "@/components/VoiceSelector";
 import { Button } from "@/components/ui/button";
-import { Lock, LockOpen } from "lucide-react";
+import { Lock, LockOpen, Mic, MicOff, Settings as SettingsIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface Preferences {
@@ -65,9 +70,18 @@ const Index = () => {
   const [showPinDialog, setShowPinDialog] = useState(false);
   const [caregiverPin, setCaregiverPin] = useState("1234");
   const [preferences, setPreferences] = useState<Preferences>(defaultPreferences);
-  const [ttsSettings, setTtsSettings] = useState({ rate: 0.45, pitch: 1.0, voice: "default" });
+  const [ttsSettings, setTtsSettings] = useState({ rate: 0.45, pitch: 1.0, voice: "default", dwellMode: false, dwellMs: 2000, scanSpeed: 1000, textScale: 1.2, highContrast: false });
   const [selectedVoiceId, setSelectedVoiceId] = useState("EXAVITQu4vr4xnSDxMaL"); // Default to Sarah
   const [showKeyboard, setShowKeyboard] = useState(false);
+  const [keyboardInput, setKeyboardInput] = useState("");
+  const [showSettings, setShowSettings] = useState(false);
+  
+  // Language and translations
+  const { language } = useLanguage();
+  const { t } = useTranslation(language);
+  
+  // Voice input for caregivers/users
+  const { isListening, transcript, isSupported: voiceSupported, startListening, stopListening, resetTranscript } = useVoiceInput();
   
   // Use ElevenLabs for amazing AI voices! 🎙️
   const elevenLabs = useElevenLabsTTS({ voiceId: selectedVoiceId });
@@ -85,6 +99,13 @@ const Index = () => {
   useScanningMode({
     enabled: preferences.enableScanning,
     speed: preferences.scanningSpeed,
+    highlightColor: '#FFD700',
+  });
+
+  // Dwell mode for accessibility (hover to click)
+  useDwellMode({
+    enabled: ttsSettings.dwellMode || false,
+    dwellTime: ttsSettings.dwellMs || 2000,
     highlightColor: '#FFD700',
   });
 
@@ -154,6 +175,25 @@ const Index = () => {
       setWordPredictions([]);
     }
   }, [utterance, preferences.enableWordPrediction]);
+
+  useEffect(() => {
+    if (keyboardInput) {
+      setUtterance(prev => prev ? [...prev, keyboardInput] : [keyboardInput]);
+      setKeyboardInput("");
+    }
+  }, [keyboardInput]);
+
+  // Handle voice input
+  useEffect(() => {
+    if (transcript && !isListening) {
+      setUtterance(prev => {
+        const currentText = prev.join(" ");
+        const newText = currentText ? `${currentText} ${transcript}` : transcript;
+        return newText.split(" ").filter(w => w.length > 0);
+      });
+      resetTranscript();
+    }
+  }, [transcript, isListening, resetTranscript]);
 
   const loadDemoData = () => {
     // Demo categories
@@ -291,6 +331,11 @@ const Index = () => {
           rate: settings.rate || 0.45,
           pitch: settings.pitch || 1.0,
           voice: settings.voice || "default",
+          dwellMode: settings.dwellMode || false,
+          dwellMs: settings.dwellMs || 2000,
+          scanSpeed: settings.scanSpeed || 1000,
+          textScale: settings.textScale || 1.2,
+          highContrast: settings.highContrast || false,
         });
       }
     }
@@ -625,9 +670,27 @@ const Index = () => {
           </div>
           
           {/* Controls - responsive layout */}
-          <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+          <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0 flex-wrap">
+            {/* Language selector */}
+            <div className="bg-white/90 text-primary rounded-md">
+              <LanguageSelector />
+            </div>
+            
             {/* Theme selector */}
             <ThemeSelector />
+            
+            {/* Voice input button */}
+            {voiceSupported && (
+              <Button
+                variant={isListening ? "default" : "secondary"}
+                size="icon"
+                onClick={isListening ? stopListening : startListening}
+                aria-label={isListening ? "Stop listening" : "Start voice input"}
+                className="h-9 w-9 sm:h-10 sm:w-10 touch-manipulation bg-white/90 hover:bg-white text-primary"
+              >
+                {isListening ? <MicOff className="h-4 w-4 sm:h-5 sm:w-5 animate-pulse" /> : <Mic className="h-4 w-4 sm:h-5 sm:w-5" />}
+              </Button>
+            )}
             
             {/* Voice selector - hide on very small screens */}
             {elevenLabs.isAvailable && (
@@ -651,11 +714,9 @@ const Index = () => {
             {/* Settings */}
             <div className="bg-white/90 text-primary rounded-md">
               <SettingsPanel
-                preferences={preferences}
-                ttsSettings={ttsSettings}
+                settings={ttsSettings}
                 voices={browserTTS.voices}
-                onPreferencesChange={handlePreferencesChange}
-                onTTSSettingsChange={handleTTSSettingsChange}
+                onSettingsChange={handleTTSSettingsChange}
               />
             </div>
             
