@@ -311,19 +311,16 @@ const Index = () => {
   const loadUserData = async () => {
     if (!session?.user) return;
 
-    // Load profile with PIN and preferences
+    // Load profile with PIN and settings
     const { data: profile } = await supabase
       .from("profiles")
-      .select("caregiver_pin, preferences, settings")
+      .select("caregiver_pin, settings")
       .eq("id", session.user.id)
       .single();
 
     if (profile) {
       if (profile.caregiver_pin) {
         setCaregiverPin(profile.caregiver_pin);
-      }
-      if (profile.preferences) {
-        setPreferences({ ...defaultPreferences, ...(profile.preferences as any) });
       }
       if (profile.settings) {
         const settings = profile.settings as any;
@@ -340,22 +337,23 @@ const Index = () => {
       }
     }
 
-    // Load categories
-    const { data: cats } = await supabase
-      .from("categories")
+    // Load boards
+    const { data: userBoards } = await supabase
+      .from("boards")
       .select("*")
       .eq("owner_id", session.user.id)
-      .order("order_index");
+      .order("name");
 
-    if (cats) {
-      setCategories(cats);
+    if (userBoards && userBoards.length > 0) {
+      setCurrentBoardId(userBoards[0].id);
     }
 
-    // Load quick phrases
+    // Load quick phrases from database
     const { data: phrases } = await supabase
       .from("quick_phrases")
       .select("*")
-      .eq("owner_id", session.user.id);
+      .order('is_emergency', { ascending: false })
+      .order('usage_count', { ascending: false });
 
     if (phrases) {
       setQuickPhrases(phrases);
@@ -365,19 +363,6 @@ const Index = () => {
           .slice(0, 4)
           .map(p => ({ id: p.id, phrase: p.phrase, icon: 'alert' as const }))
       );
-    }
-
-    // Load or create default board
-    let { data: boards } = await supabase
-      .from("boards")
-      .select("*")
-      .eq("owner_id", session.user.id)
-      .limit(1);
-
-    if (!boards || boards.length === 0) {
-      await createDefaultBoard();
-    } else {
-      setCurrentBoardId(boards[0].id);
     }
   };
 
@@ -611,13 +596,7 @@ const Index = () => {
 
   const handlePreferencesChange = async (newPreferences: Preferences) => {
     setPreferences(newPreferences);
-    
-    if (!DEV_MODE && session?.user) {
-      await supabase
-        .from("profiles")
-        .update({ preferences: newPreferences as any })
-        .eq("id", session.user.id);
-    }
+    // Note: preferences are stored in memory only, not persisted to database
   };
 
   const handleTTSSettingsChange = async (newSettings: typeof ttsSettings) => {
@@ -763,7 +742,6 @@ const Index = () => {
         onKeyboardToggle={handleKeyboardToggle}
         showKeyboard={showKeyboard}
         isSpeaking={isSpeaking}
-        quickPhrases={quickPhrases}
         onQuickPhraseSelect={handleQuickPhraseSelect}
       />
 

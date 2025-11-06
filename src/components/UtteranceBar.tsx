@@ -12,7 +12,6 @@ interface UtteranceBarProps {
   onKeyboardToggle: () => void;
   showKeyboard: boolean;
   isSpeaking: boolean;
-  quickPhrases: QuickPhrase[];
   onQuickPhraseSelect: (phrase: string) => void;
 }
 
@@ -26,7 +25,6 @@ export const UtteranceBar = ({
   onKeyboardToggle,
   showKeyboard,
   isSpeaking,
-  quickPhrases,
   onQuickPhraseSelect
 }: UtteranceBarProps) => {
   return (
@@ -69,7 +67,6 @@ export const UtteranceBar = ({
               <Keyboard className="h-5 w-5" />
             </Button>
             <QuickPhrasesPanel 
-              phrases={quickPhrases}
               onPhraseSelect={onQuickPhraseSelect}
             />
           </div>
